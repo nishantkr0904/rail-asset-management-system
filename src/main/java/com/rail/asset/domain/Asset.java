@@ -2,6 +2,7 @@ package com.rail.asset.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,20 +10,23 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(
-    name = "assets",
-    indexes = {
+@Table(name = "assets", indexes = {
         @Index(name = "idx_asset_category_status", columnList = "category,status"),
         @Index(name = "idx_asset_location_code", columnList = "location_code"),
         @Index(name = "idx_asset_last_inspection_date", columnList = "last_inspection_date")
-    },
-    uniqueConstraints = {
+}, uniqueConstraints = {
         @UniqueConstraint(name = "uk_asset_code", columnNames = "asset_code")
-    }
-)
+})
+@EntityListeners(AuditingEntityListener.class)
 public class Asset {
 
     @Id
@@ -74,28 +78,43 @@ public class Asset {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
+    @CreatedBy
+    @Column(name = "created_by", nullable = false, updatable = false, length = 64)
+    private String createdBy;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", length = 64)
+    private String lastModifiedBy;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
     protected Asset() {
         // JPA constructor
     }
 
     public Asset(
-        Long id,
-        String assetCode,
-        String name,
-        String category,
-        String subCategory,
-        String manufacturer,
-        String modelNumber,
-        String serialNumber,
-        LocalDate installDate,
-        String status,
-        String locationCode,
-        Integer maintenanceCycleDays,
-        LocalDate lastInspectionDate,
-        BigDecimal depreciationRate,
-        BigDecimal acquisitionCost,
-        String notes
-    ) {
+            Long id,
+            String assetCode,
+            String name,
+            String category,
+            String subCategory,
+            String manufacturer,
+            String modelNumber,
+            String serialNumber,
+            LocalDate installDate,
+            String status,
+            String locationCode,
+            Integer maintenanceCycleDays,
+            LocalDate lastInspectionDate,
+            BigDecimal depreciationRate,
+            BigDecimal acquisitionCost,
+            String notes) {
         this.id = id;
         this.assetCode = assetCode;
         this.name = name;
@@ -240,5 +259,37 @@ public class Asset {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
